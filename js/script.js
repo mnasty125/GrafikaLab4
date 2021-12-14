@@ -17,6 +17,8 @@ let ctx = canvas.getContext("2d");
 canvas.width = vw;
 canvas.height = vh;
 
+ctx.font = "14px Verdana";
+
 // ГРАФИЧЕСКАЯ БИБЛИОТЕКА
 //Функция отрисовки пикселя
 let pixel = (x, y, color) => {
@@ -118,16 +120,15 @@ let DrawCircle = (_x, _y, radius, stroke) => {
 
 //ТРИАНГУЛЯЦИЯ
 //Площадь треугольника
-// let triangleSquare = (A, B, C) => {
-//   return (
-//     (1 / 2) * Math.abs((B.x - A.x) * (C.y - A.y) - (C.x - A.x) * (B.y - A.y))
-//   );
-// };
+let triangleSquare = (A, B, C) => {
+  return (
+    (1 / 2) * Math.abs((B.x - A.x) * (C.y - A.y) - (C.x - A.x) * (B.y - A.y))
+  );
+};
 // Принадлежит ли точка треугольнику?
 let inTriangle = (A, B, C, D) => {
   return (
-    triangleSquare(A, B, C) ===
-    triangleSquare(A, B, D) + triangleSquare(A, C, D) + triangleSquare(B, D, C)
+    triangleSquare(A, B, C) == triangleSquare(A, B, D) + triangleSquare(B, C, D) + triangleSquare(C, A, D)
   );
 };
 // Левая тройка векторов?
@@ -141,7 +142,7 @@ let isLeft = (A, B, C) => {
       y: C.y - A.y,
     };
 
-  return AB.x * AC.y - AC.x * AB.y < 0;
+  return AB.x * AC.y - AC.x * AB.y > 0;
 };
 // Есть ли другие точки внутри рассматриваемого треугольника?
 let hasPointOfPolygon = (points) => {
@@ -157,20 +158,23 @@ let hasPointOfPolygon = (points) => {
 };
 
 let triangulate = (polygon) => {
+    temp = 1;
   while (polygon.length >= 3) {
     if (
-      isLeft(polygon[0], polygon[1], polygon[2]) &&
-      !hasPointOfPolygon(polygon)
+      isLeft(polygon[0], polygon[1], polygon[2]) && !hasPointOfPolygon(polygon)
     ) {
-      const x1 = polygon[0].x,
-        y1 = polygon[0].y;
-      const x2 = polygon[1].x,
-        y2 = polygon[1].y;
-      const x3 = polygon[2].x,
-        y3 = polygon[2].y;
-      DrawTriangle(x1, y1, x2, y2, x3, y3, color);
-
+      DrawTriangle(
+        polygon[0].x,
+        polygon[0].y,
+        polygon[1].x,
+        polygon[1].y,
+        polygon[2].x,
+        polygon[2].y,
+        'black'
+      );
+      ctx.fillText(temp, (polygon[0].x + polygon[1].x + polygon[2].x) / 3, (polygon[0].y + polygon[1].y + polygon[2].y) / 3);
       polygon.splice(1, 1);
+      temp++;
     } else {
       const tmp = polygon[0];
       polygon.shift();
@@ -192,25 +196,24 @@ let drawPoints = () => {
   points.forEach((p) => {
     DrawCircle(p.x, p.y, 2, "black");
   });
-  //   for (let i = 0; i < points.length; i++) {
-  //     DrawLine(
-  //       points[i].x,
-  //       points[i].y,
-  //       points[i + 1].x,
-  //       points[i + 1].y,
-  //       "black"
-  //     );
-  //   }
-  triangulate(points);
+  for (let i = 0; i < points.length; i++) {
+    DrawLine(
+      points[i].x,
+      points[i].y,
+      points[i + 1].x,
+      points[i + 1].y,
+      "black"
+    );
+  }
 };
 
-// window.addEventListener("keydown", () => {
-//   DrawLine(
-//     points[0].x,
-//     points[0].y,
-//     points[points.length - 1].x,
-//     points[points.length - 1].y,
-//     "black"
-//   );
-
-// });
+window.addEventListener("keydown", () => {
+  DrawLine(
+    points[0].x,
+    points[0].y,
+    points[points.length - 1].x,
+    points[points.length - 1].y,
+    "black"
+  );
+  triangulate(points);
+});
