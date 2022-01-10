@@ -128,7 +128,8 @@ let triangleSquare = (A, B, C) => {
 // Принадлежит ли точка треугольнику?
 let inTriangle = (A, B, C, D) => {
   return (
-    triangleSquare(A, B, C) == triangleSquare(A, B, D) + triangleSquare(B, C, D) + triangleSquare(C, A, D)
+    triangleSquare(A, B, C) ==
+    triangleSquare(A, B, D) + triangleSquare(B, C, D) + triangleSquare(C, A, D)
   );
 };
 // Левая тройка векторов?
@@ -158,10 +159,11 @@ let hasPointOfPolygon = (points) => {
 };
 
 let triangulate = (polygon) => {
-    temp = 1;
+  temp = 1;
   while (polygon.length >= 3) {
     if (
-      isLeft(polygon[0], polygon[1], polygon[2]) && !hasPointOfPolygon(polygon)
+      isLeft(polygon[0], polygon[1], polygon[2]) &&
+      !hasPointOfPolygon(polygon)
     ) {
       DrawTriangle(
         polygon[0].x,
@@ -170,9 +172,13 @@ let triangulate = (polygon) => {
         polygon[1].y,
         polygon[2].x,
         polygon[2].y,
-        'black'
+        "purple"
       );
-      ctx.fillText(temp, (polygon[0].x + polygon[1].x + polygon[2].x) / 3, (polygon[0].y + polygon[1].y + polygon[2].y) / 3);
+      ctx.fillText(
+        temp,
+        (polygon[0].x + polygon[1].x + polygon[2].x) / 3,
+        (polygon[0].y + polygon[1].y + polygon[2].y) / 3
+      );
       polygon.splice(1, 1);
       temp++;
     } else {
@@ -194,7 +200,7 @@ window.addEventListener("click", (event) => {
 let drawPoints = () => {
   ctx.clearRect(0, 0, vw, vh);
   points.forEach((p) => {
-    DrawCircle(p.x, p.y, 2, "black");
+    DrawCircle(p.x, p.y, 2, "purple");
   });
   for (let i = 0; i < points.length; i++) {
     DrawLine(
@@ -202,18 +208,27 @@ let drawPoints = () => {
       points[i].y,
       points[i + 1].x,
       points[i + 1].y,
-      "black"
+      "purple"
     );
   }
 };
 
+let play = false;
+
 window.addEventListener("keydown", () => {
-  DrawLine(
-    points[0].x,
-    points[0].y,
-    points[points.length - 1].x,
-    points[points.length - 1].y,
-    "black"
-  );
-  triangulate(points);
+  if (play == false) {
+    DrawLine(
+      points[0].x,
+      points[0].y,
+      points[points.length - 1].x,
+      points[points.length - 1].y,
+      "black"
+    );
+    triangulate(points);
+    play = true;
+  } else {
+    ctx.clearRect(0, 0, vw, vh);
+    points = [];
+    play = false;
+  }
 });
